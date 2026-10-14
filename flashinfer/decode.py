@@ -1768,9 +1768,12 @@ class BatchDecodeWithPagedKVCacheWrapper:
             self._paged_kv_last_page_len_buf = last_page_len.to(
                 self.device, non_blocking=non_blocking
             )
-            self._qo_indptr_buf = qo_indptr_host.to(
-                self.device, non_blocking=non_blocking
-            )
+            if self.use_tensor_cores:
+                self._qo_indptr_buf = qo_indptr_host.to(
+                    self.device, non_blocking=non_blocking
+                )
+            else:
+                self._qo_indptr_buf = None
 
         indptr_host = indptr.to("cpu")
         last_page_len_host = last_page_len.to("cpu")
